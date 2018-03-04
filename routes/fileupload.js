@@ -1,22 +1,15 @@
 const express = require('express')
 const router = express.Router()
-const { uploadFile } = require('../express-fileupload/fileuploadClient')
+const { upload } = require('../multer-s3-fileupload/s3UploadClient')
 
 // Upload a file
-router.post('/upload', (req, res) => {
+router.post('/upload', upload.array('inputFile', 3), (req, res) => {
   if (!req.files) res.status(400).json({ error: 'No files were uploaded.' })
 
-  // The name of the input field (i.e. "csvFile") is used to retrieve the uploaded file
-  const csvFile = req.files.csvFile
-
-  // Upload the file
-  uploadFile(csvFile)
-    .then(data => {
-      res.status(201).json({ data })
-    })
-    .catch(error => {
-      res.status(400).json({ error })
-    })  
+  res.status(201).json({
+    message: 'Successfully uploaded ' + req.files.length + ' files!',
+    files: req.files
+  })
 })
 
 module.exports = router
